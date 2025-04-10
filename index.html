@@ -1,102 +1,97 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>Rudra Parayanam Assignment</title>
+  <title>Rudra Parayanam / Daily Prayers Assignment</title>
   <style>
-    body { font-family: Arial, sans-serif; padding: 20px; background: #f9f9f9; }
-    h2 { color: #444; }
-    table { width: 100%; border-collapse: collapse; background: #fff; }
-    th, td { border: 1px solid #ccc; padding: 10px; }
-    th { background-color: #e0f7fa; }
-    input[type="text"] {
-      width: 100%;
-      border: none;
-      background: transparent;
-      font-size: 14px;
+    body { font-family: sans-serif; padding: 1em; background-color: #f9f9f9; }
+    h2 { margin-bottom: 0.2em; }
+    p.description {
+      background: #fffbe7;
+      border-left: 4px solid #ffcc00;
+      padding: 1em;
+      margin-bottom: 1.5em;
+      font-size: 0.95em;
     }
-    input[type="text"]:focus {
-      outline: none;
-      background: #f0f8ff;
-    }
-    button { margin-top: 10px; margin-right: 10px; padding: 8px 12px; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 1em; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { background-color: #f0f0f0; }
+    input[type="text"] { width: 100%; border: none; background: transparent; }
+    .section { font-weight: bold; background: #e0f7fa; }
+    button.clear-row { padding: 4px 8px; background: #ffdddd; border: 1px solid #ccc; }
   </style>
 </head>
 <body>
-  <h2>Rudra Parayanam Assignment</h2>
-  <p>Editable version: Add/Edit segments, sections, and assignments below. Fields and sections are all editable. Saved locally.</p>
 
-  <table id="assignmentTable">
-    <thead>
-      <tr><th>Chant / Segment</th><th>Assigned To</th></tr>
-    </thead>
-    <tbody id="tableBody">
-      <tr><td><input type="text" value="Omkaram & Ganapathi Prarthana"></td><td><input type="text" value="Ridith"></td></tr>
-    </tbody>
-  </table>
+<h2>Rudra Parayanam / Daily Prayers Assignment</h2>
 
-  <button onclick="addRow()">Add Row</button>
-  <button onclick="addSection()">Add Section Header</button>
-  <button onclick="saveTable()">Save</button>
-  <button onclick="clearTable()">Clear</button>
+<p class="description">
+  <strong>Samastha Lokah Sukhino Bhavantu</strong><br><br>
+  The following is the list of sisters and children who volunteered to participate in today's 
+  Shata Sampoorna Rudra Parayanam / Daily Prayers.
+</p>
 
-  <script>
-    function addRow() {
-      const tbody = document.getElementById('tableBody');
-      const row = document.createElement('tr');
-      row.innerHTML = `
-        <td><input type="text"></td>
-        <td><input type="text"></td>
-      `;
-      tbody.appendChild(row);
+<table id="assignmentTable">
+  <tr><th>Segment</th><th>Sub-segment</th><th>Assigned To</th><th>Action</th></tr>
+
+  <tr class="section"><td colspan="4">Omkaram & Ganapathi Prarthana</td></tr>
+  <tr><td></td><td></td><td><input type="text" value="Ridith"></td><td><button class="clear-row" onclick="clearRow(this)">Clear</button></td></tr>
+
+  <tr class="section"><td colspan="4">Sai Gayatri Mantra</td></tr>
+  <tr><td></td><td>Repetition 1</td><td><input type="text" value="Uma"></td><td><button class="clear-row" onclick="clearRow(this)">Clear</button></td></tr>
+  <tr><td></td><td>Repetition 2</td><td><input type="text" value="Kameshwari Akka"></td><td><button class="clear-row" onclick="clearRow(this)">Clear</button></td></tr>
+  <tr><td></td><td>Repetition 3</td><td><input type="text" value="Sreedevi"></td><td><button class="clear-row" onclick="clearRow(this)">Clear</button></td></tr>
+  <tr><td></td><td>Repetition 4</td><td><input type="text" value="Ridith"></td><td><button class="clear-row" onclick="clearRow(this)">Clear</button></td></tr>
+
+  <!-- Add more rows as needed in same format -->
+
+</table>
+
+<button onclick="saveTable()">Save All</button>
+<button onclick="clearAll()">Clear All</button>
+
+<script>
+function saveTable() {
+  const data = [];
+  document.querySelectorAll('#assignmentTable tr').forEach(row => {
+    const cells = row.querySelectorAll('td');
+    if (cells.length && cells[2]?.querySelector('input')) {
+      const segment = cells[0].innerText || '';
+      const sub = cells[1]?.innerText || '';
+      const input = cells[2]?.querySelector('input');
+      const name = input?.value || '';
+      data.push([segment, sub, name]);
     }
+  });
+  localStorage.setItem('rudraAssignments', JSON.stringify(data));
+  alert('Assignments saved to local storage.');
+}
 
-    function addSection() {
-      const tbody = document.getElementById('tableBody');
-      const row = document.createElement('tr');
-      row.innerHTML = `
-        <td colspan="2"><input type="text" style="width: 100%; font-weight: bold; background-color: #c8e6c9;"></td>
-      `;
-      tbody.appendChild(row);
+function clearRow(button) {
+  const row = button.closest('tr');
+  const input = row.querySelector('input');
+  if (input) input.value = '';
+}
+
+function clearAll() {
+  if (confirm("Clear all assignments?")) {
+    document.querySelectorAll('#assignmentTable input').forEach(input => input.value = '');
+    localStorage.removeItem('rudraAssignments');
+  }
+}
+
+window.onload = () => {
+  const data = JSON.parse(localStorage.getItem('rudraAssignments') || '[]');
+  const rows = document.querySelectorAll('#assignmentTable tr');
+  let dataIndex = 0;
+  rows.forEach(row => {
+    const input = row.querySelector('input');
+    if (input && data[dataIndex]) {
+      input.value = data[dataIndex][2];
+      dataIndex++;
     }
+  });
+}
+</script>
 
-    function saveTable() {
-      const rows = document.querySelectorAll('#assignmentTable tbody tr');
-      const data = [];
-      rows.forEach(row => {
-        const inputs = row.querySelectorAll('input');
-        if (inputs.length === 1) {
-          data.push([inputs[0].value, null]);
-        } else if (inputs.length === 2) {
-          data.push([inputs[0].value, inputs[1].value]);
-        }
-      });
-      localStorage.setItem('rudraAssignments', JSON.stringify(data));
-      alert('Assignments saved locally.');
-    }
-
-    function clearTable() {
-      if (confirm('Clear all assignments?')) {
-        document.getElementById('tableBody').innerHTML = '';
-        localStorage.removeItem('rudraAssignments');
-      }
-    }
-
-    window.onload = () => {
-      const data = JSON.parse(localStorage.getItem('rudraAssignments') || '[]');
-      const tbody = document.getElementById('tableBody');
-      data.forEach(row => {
-        const tr = document.createElement('tr');
-        if (row[1] === null) {
-          tr.innerHTML = `<td colspan="2"><input type="text" style="width: 100%; font-weight: bold; background-color: #c8e6c9;" value="${row[0]}"></td>`;
-        } else {
-          tr.innerHTML = `<td><input type="text" value="${row[0]}"></td><td><input type="text" value="${row[1]}"></td>`;
-        }
-        tbody.appendChild(tr);
-      });
-    };
-  </script>
 </body>
 </html>
-“Initial upload”
-
