@@ -12,36 +12,35 @@
       margin-bottom: 1.5em;
       font-size: 0.95em;
     }
-    table { width: 100%; border-collapse: collapse; margin-bottom: 1em; }
+    table { width: 100%; border-collapse: collapse; margin-top: 1em; }
     th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
     th { background-color: #f0f0f0; }
     input[type="text"] { width: 100%; border: none; background: transparent; }
-    .section { font-weight: bold; background: #e0f7fa; }
-    button { margin-right: 5px; padding: 6px 10px; }
-    button.clear-row { background: #ffdada; border: 1px solid #ccc; }
+    .section { background: #e0f7fa; font-weight: bold; }
+    button { margin-right: 5px; padding: 6px 10px; margin-bottom: 10px; }
+    .clear-row { background: #ffdada; border: 1px solid #ccc; }
   </style>
 </head>
 <body>
 
 <h2>Rudra Parayanam / Daily Prayers Assignment</h2>
-
 <p class="description">
   <strong>Samastha Lokah Sukhino Bhavantu</strong><br><br>
   The following is the list of sisters and children who volunteered to participate in today's 
   Shata Sampoorna Rudra Parayanam / Daily Prayers.
 </p>
 
-<table id="assignmentTable">
-  <tr><th>Segment</th><th>Sub-segment</th><th>Assigned To</th><th>Action</th></tr>
-</table>
-
-<!-- Controls -->
+<!-- Top Buttons -->
 <input type="text" id="sectionName" placeholder="New Section Name" />
 <button onclick="addSection()">Add Section</button>
-<br><br>
 <button onclick="addLine()">Add Line</button>
 <button onclick="saveTable()">Save All</button>
 <button onclick="clearAll()">Clear All</button>
+
+<!-- Table -->
+<table id="assignmentTable">
+  <tr><th>Segment</th><th>Assigned To</th><th>Action</th></tr>
+</table>
 
 <script>
 let table = document.getElementById("assignmentTable");
@@ -54,9 +53,9 @@ function addSection() {
   }
   const row = table.insertRow();
   const cell = row.insertCell(0);
-  cell.colSpan = 4;
+  cell.colSpan = 3;
   cell.className = "section";
-  cell.innerText = name;
+  cell.innerHTML = `<input type="text" value="${name}" style="font-weight:bold; width:100%;" />`;
   document.getElementById("sectionName").value = "";
 }
 
@@ -64,8 +63,7 @@ function addLine() {
   const row = table.insertRow();
   row.innerHTML = `
     <td><input type="text" placeholder="Segment" /></td>
-    <td><input type="text" placeholder="Sub-segment" /></td>
-    <td><input type="text" placeholder="Name" /></td>
+    <td><input type="text" placeholder="Assigned To" /></td>
     <td><button class="clear-row" onclick="clearRow(this)">Clear</button></td>
   `;
 }
@@ -80,13 +78,13 @@ function saveTable() {
   Array.from(table.rows).forEach(row => {
     const cells = row.cells;
     if (cells.length === 1 && cells[0].classList.contains("section")) {
-      data.push({ type: "section", name: cells[0].innerText });
-    } else if (cells.length === 4 && cells[2].querySelector("input")) {
+      const input = cells[0].querySelector("input");
+      data.push({ type: "section", name: input ? input.value : "" });
+    } else if (cells.length === 3 && cells[1].querySelector("input")) {
       data.push({
         type: "line",
         segment: cells[0].querySelector("input")?.value || "",
-        sub: cells[1].querySelector("input")?.value || "",
-        name: cells[2].querySelector("input")?.value || ""
+        assigned: cells[1].querySelector("input")?.value || ""
       });
     }
   });
@@ -109,22 +107,20 @@ function loadTable() {
     if (item.type === "section") {
       const row = table.insertRow();
       const cell = row.insertCell(0);
-      cell.colSpan = 4;
+      cell.colSpan = 3;
       cell.className = "section";
-      cell.innerText = item.name;
+      cell.innerHTML = `<input type="text" value="${item.name}" style="font-weight:bold; width:100%;" />`;
     } else if (item.type === "line") {
       const row = table.insertRow();
       row.innerHTML = `
         <td><input type="text" value="${item.segment}" /></td>
-        <td><input type="text" value="${item.sub}" /></td>
-        <td><input type="text" value="${item.name}" /></td>
+        <td><input type="text" value="${item.assigned}" /></td>
         <td><button class="clear-row" onclick="clearRow(this)">Clear</button></td>
       `;
     }
   });
 }
 
-// Load saved data on page load
 window.onload = loadTable;
 </script>
 
